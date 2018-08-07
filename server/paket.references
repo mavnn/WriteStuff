@@ -1,0 +1,8 @@
+Freya.Hopac
+Microsoft.AspNetCore.Server.Kestrel
+Microsoft.AspNetCore.Owin
+FSharp.Core
+Microsoft.Extensions.Logging.Console
+Fable.JsonConverter
+MySqlConnector
+Marten

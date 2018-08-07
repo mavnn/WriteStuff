@@ -1,0 +1,6 @@
+paket-files/
+packages/
+bin/
+obj/
+*.userprefs
+*.suo
