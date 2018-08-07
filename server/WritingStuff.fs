@@ -38,63 +38,51 @@ type Event =
 
 let apply state command =
     match command with
-    | Create user ->
+    | Create user -> 
         match state with
-        | Empty ->
-            [ Created user ]
-        | _ ->
-            [ InvalidCommandForState (state, command) ]
-    | UpdateTitle newTitle ->
+        | Empty -> [ Created user ]
+        | _ -> [ InvalidCommandForState(state, command) ]
+    | UpdateTitle newTitle -> 
         match state with
-        | Writing inProgress ->
-            [ TitleUpdated newTitle ]
-        | _ ->
-            [ InvalidCommandForState (state, command) ]
-    | UpdateDoc newDoc ->
+        | Writing inProgress -> [ TitleUpdated newTitle ]
+        | _ -> [ InvalidCommandForState(state, command) ]
+    | UpdateDoc newDoc -> 
         match state with
-        | Writing inProgress ->
-            [ DocUpdated newDoc ]
-        | _ ->
-            [ InvalidCommandForState (state, command) ]
-    | UpdateBoth (newTitle, newDoc) ->
+        | Writing inProgress -> [ DocUpdated newDoc ]
+        | _ -> [ InvalidCommandForState(state, command) ]
+    | UpdateBoth(newTitle, newDoc) -> 
         match state with
-        | Writing inProgress ->
+        | Writing inProgress -> 
             [ TitleUpdated newTitle
               DocUpdated newDoc ]
-        | _ ->
-            [ InvalidCommandForState (state, command) ]
-    | Submit ->
+        | _ -> [ InvalidCommandForState(state, command) ]
+    | Submit -> 
         match state with
-        | Writing { title = Some _; document = Some _ } ->
-            [ Submitted ]
-        | _ ->
-            [ InvalidCommandForState (state, command) ]
+        | Writing { title = Some _; document = Some _ } -> [ Submitted ]
+        | _ -> [ InvalidCommandForState(state, command) ]
 
 let fold state evt =
     match evt with
-    | Created u ->
-        Writing (InProgress.Create u)
-    | TitleUpdated t ->
+    | Created u -> Writing(InProgress.Create u)
+    | TitleUpdated t -> 
         match state with
-        | Writing inProgress ->
-            Writing { inProgress with title = Some t }
-        | _ ->
+        | Writing inProgress -> Writing { inProgress with title = Some t }
+        | _ -> 
             eprintfn "Invalid event for state in store"
             state
-    | DocUpdated d ->
+    | DocUpdated d -> 
         match state with
-        | Writing inProgress ->
-            Writing { inProgress with document = Some d }
-        | _ ->
+        | Writing inProgress -> Writing { inProgress with document = Some d }
+        | _ -> 
             eprintfn "Invalid event for state in store"
             state
-    | InvalidCommandForState _ ->
-        state
-    | Submitted ->
+    | InvalidCommandForState _ -> state
+    | Submitted -> 
         match state with
-        | Writing { title = Some t; document = Some d; owner = o } ->
-            Finished { title = t; document = d; owner = o }
-        | _ ->
+        | Writing { title = Some t; document = Some d; owner = o } -> 
+            Finished { title = t
+                       document = d
+                       owner = o }
+        | _ -> 
             eprintfn "Invalid event for state in store"
             state
-

@@ -27,22 +27,22 @@ let initializeStore host username password =
         builder.Username <- username
         builder.Password <- password
         builder.ConnectionString
-
+    
     let setOptions (storeOptions : StoreOptions) =
         storeOptions.Connection(connString)
         storeOptions.Events.StreamIdentity <- Events.StreamIdentity.AsString
         storeOptions.Events.AddEventType(typeof<EventWrapper>)
-        storeOptions.Events.InlineProjections.AggregateStreamsWith<AggregateWritingStuffState>()
-        |> ignore
-
-
+        storeOptions.Events.InlineProjections.AggregateStreamsWith<AggregateWritingStuffState>
+            () |> ignore
+    
     DocumentStore.For(setOptions)
 
-let writeEvents (store : IDocumentStore) (id : string) (evts : WritingStuff.Event seq) =
-    job {
+let writeEvents (store : IDocumentStore) (id : string) 
+    (evts : WritingStuff.Event seq) =
+    job { 
         use session =
-            store.OpenSession(DocumentTracking.None,
-                              Data.IsolationLevel.Serializable)
+            store.OpenSession
+                (DocumentTracking.None, Data.IsolationLevel.Serializable)
         printfn "Writing %d events to stream %s" (Seq.length evts) id
         for evt in evts do
             session.Events.Append(id, EventWrapper evt) |> ignore
@@ -52,16 +52,12 @@ let writeEvents (store : IDocumentStore) (id : string) (evts : WritingStuff.Even
     }
 
 let getState (store : IDocumentStore) (id : string) =
-    job {
+    job { 
         use session =
-            store.OpenSession(DocumentTracking.None,
-                              Data.IsolationLevel.Serializable)
-        let! state =
-            fun () ->
-                session.LoadAsync<AggregateWritingStuffState>(id)
-            |> Job.fromTask
-        if isNull (box state) then
-            return None
-        else
-            return Some (state.Data.State)
+            store.OpenSession
+                (DocumentTracking.None, Data.IsolationLevel.Serializable)
+        let! state = fun () -> session.LoadAsync<AggregateWritingStuffState>(id) 
+                     |> Job.fromTask
+        if isNull (box state) then return None
+        else return Some(state.Data.State)
     }
